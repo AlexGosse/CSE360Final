@@ -8,11 +8,12 @@ class MenuExample implements ActionListener, MenuListener
 {
     JMenu fmenu, amenu;
     JMenuItem loadButton, addButton, saveButton, plotButton;
+    JFrame frame;
 
     MenuExample(){
 
         //initialize frames and menubars
-        JFrame frame = new JFrame("CSE360 Final Project");
+        frame = new JFrame("CSE360 Final Project");
         JMenuBar mb = new JMenuBar();
         JMenuBar aboutbar = new JMenuBar();
 
@@ -77,6 +78,13 @@ class MenuExample implements ActionListener, MenuListener
     public void menuSelected(MenuEvent a)
     {
         //about process
+        JOptionPane.showMessageDialog(frame, "Hello! Welcome to our CSE360 Final Project!\n" +
+                "Our team members are:\n" +
+                "Alexander Gossett\n" +
+                "Abraham Cervantes\n" +
+                "NAME HERE\n" +
+                "NAME HERE\n"
+        );
     }
     public void menuDeselected(MenuEvent e) { }
     public void menuCanceled(MenuEvent e) { }
