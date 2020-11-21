@@ -4,7 +4,7 @@ class MenuExample
     JMenu menu, amenu;
     JMenuItem loadButton, addButton, saveButton, plotButton;
     MenuExample(){
-        JFrame f= new JFrame("Menu and MenuItem Example");
+        JFrame f= new JFrame("CSE360 Final Project");
         JMenuBar mb = new JMenuBar();
         menu=new JMenu("File");
 
