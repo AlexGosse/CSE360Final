@@ -8,11 +8,10 @@ class MenuExample implements ActionListener, MenuListener
 {
     JMenu fmenu, amenu;
     JMenuItem loadButton, addButton, saveButton, plotButton;
+
     MenuExample(){
 
-        MenuListener listener;
-
-
+        //initialize frames and menubars
         JFrame frame = new JFrame("CSE360 Final Project");
         JMenuBar mb = new JMenuBar();
         JMenuBar aboutbar = new JMenuBar();
