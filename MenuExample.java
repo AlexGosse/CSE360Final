@@ -55,7 +55,10 @@ class MenuExample implements ActionListener, MenuListener
     {
         if(e.getSource()==loadButton)
         {
-            //load process
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileSelectionMode(JFileChooser.APPROVE_OPTION);
+            chooser.setDialogTitle("Choose a file path");
+            chooser.showOpenDialog(null);
         }
 
         if(e.getSource()==addButton)
