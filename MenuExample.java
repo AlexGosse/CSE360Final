@@ -82,7 +82,7 @@ class MenuExample implements ActionListener, MenuListener
                 "Our team members are:\n" +
                 "Alexander Gossett\n" +
                 "Abraham Cervantes\n" +
-                "NAME HERE\n" +
+                "Akshaj Kumar\n" +
                 "NAME HERE\n"
         );
     }
