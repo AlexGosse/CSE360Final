@@ -12,5 +12,21 @@ public class User {
     }
 
     //Getters and setters
+    public int getID() { return ID; }
+    public void setID(int ID) { this.ID = ID; }
 
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) {this.lastName = lastName; }
+
+    public String getProgramAndPlan() {return ProgramAndPlan; }
+    public void setProgramAndPlan(String programAndPlan) {ProgramAndPlan = programAndPlan; }
+
+    public String getAcademicLevel() { return AcademicLevel;}
+    public void setAcademicLevel(String academicLevel) {AcademicLevel = academicLevel;}
+
+    public String getASURITE() {return ASURITE;}
+    public void setASURITE(String ASURITE) {this.ASURITE = ASURITE;}
 }
