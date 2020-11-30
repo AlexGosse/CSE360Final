@@ -1,19 +1,28 @@
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 
 class MenuExample implements ActionListener, MenuListener
 {
     JMenu fmenu, amenu;
     JMenuItem loadButton, addButton, saveButton, plotButton;
     JFrame frame;
+    Load fileLoaded;
 
-    MenuExample(){
-
+    MenuExample(JFrame frame){
+        this.frame = frame;
         //initialize frames and menubars
-        frame = new JFrame("CSE360 Final Project");
         JMenuBar mb = new JMenuBar();
         JMenuBar aboutbar = new JMenuBar();
 
@@ -45,20 +54,70 @@ class MenuExample implements ActionListener, MenuListener
         mb.add(amenu);
 
         //create frame
-        frame.setJMenuBar(mb);
-        frame.setSize(400,400);
-        frame.setLayout(null);
-        frame.setVisible(true);
+        this.frame.setJMenuBar(mb);
+        this.frame.setSize(400,400);
+        //this.frame.setLayout(null);
+        this.frame.setVisible(true);
     }
 
     public void actionPerformed(ActionEvent e)
     {
         if(e.getSource()==loadButton)
         {
-            JFileChooser chooser = new JFileChooser();
-            chooser.setFileSelectionMode(JFileChooser.APPROVE_OPTION);
-            chooser.setDialogTitle("Choose a file path");
-            chooser.showOpenDialog(null);
+            JFileChooser filechoose = new JFileChooser(FileSystemView.getFileSystemView());
+            FileNameExtensionFilter csvfilter = new FileNameExtensionFilter("CSV only", "CSV");
+            filechoose.setFileFilter(csvfilter);
+            filechoose.setAcceptAllFileFilterUsed(false);
+            int r = filechoose.showOpenDialog(frame);
+
+            if (r == 1) {
+                JOptionPane.showMessageDialog(frame, "No file selected.");
+                return;
+            }
+            File selectedFile = filechoose.getSelectedFile();
+            //read and create table
+
+            if (selectedFile.exists()) {
+                String[] columns = new String[]{"ID", "First Name", "Last Name", "Program and Plan", "Academic Level", "ASURITE"};
+                //need help on Jtable
+
+                JTable table = new JTable();
+
+                try {
+                    FileInputStream fileinput = new FileInputStream(selectedFile);
+                } catch (FileNotFoundException fileNotFoundException) {
+                    fileNotFoundException.printStackTrace();
+                }
+                Scanner scan = null;
+                try {
+                    scan = new Scanner(selectedFile);
+                } catch (FileNotFoundException fileNotFoundException) {
+                    fileNotFoundException.printStackTrace();
+                }
+                String[] array;
+                DefaultTableModel model = new DefaultTableModel(columns, 0);
+                while (scan.hasNextLine()) {
+                    String line = scan.nextLine();
+                    System.out.println(line);
+                    if (line.indexOf(",") > -1)
+                        array = line.split(",");
+                    else
+                        array = line.split("\t");
+                    Object[] data = new Object[array.length];
+                    for (int i = 0; i < array.length; i++)
+                        data[i] = array[i];
+
+                    model.addRow(data);
+                }
+                table.setModel(model);
+                System.out.println(table.getRowCount());
+                JPanel tableholder = new JPanel();
+                JScrollPane tablescroll = new JScrollPane(table);
+                frame.getContentPane().add(tablescroll, BorderLayout.CENTER);
+                this.frame.setSize(700,400);
+
+
+            }
         }
 
         if(e.getSource()==addButton)
@@ -81,19 +140,13 @@ class MenuExample implements ActionListener, MenuListener
     public void menuSelected(MenuEvent a)
     {
         //about process
-        JOptionPane.showMessageDialog(frame, "Hello! Welcome to our CSE360 Final Project!\n" +
-                "Our team members are:\n" +
-                "Alexander Gossett\n" +
-                "Abraham Cervantes\n" +
-                "Akshaj Kumar\n" +
-                "NAME HERE\n"
-        );
     }
     public void menuDeselected(MenuEvent e) { }
     public void menuCanceled(MenuEvent e) { }
 
     public static void main(String args[])
     {
-        new MenuExample();
+        JFrame frame1 = new JFrame("CSE360 Final Project");
+        new MenuExample(frame1);
     }
 }
