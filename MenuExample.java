@@ -1,4 +1,11 @@
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.chart.*;
+
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -14,10 +21,9 @@ import java.util.Scanner;
 import java.util.Vector;
 
 
-class MenuExample implements ActionListener, MenuListener
-{
+class MenuExample implements ActionListener {
     JMenu fmenu, amenu;
-    JMenuItem loadButton, addButton, saveButton, plotButton;
+    JMenuItem loadButton, addButton, saveButton, plotButton, aboutButton;
     JFrame frame;
     Load fileLoaded;
     JTable globaltable;
@@ -41,19 +47,21 @@ class MenuExample implements ActionListener, MenuListener
         addButton=new JMenuItem("Add Attendance");
         saveButton=new JMenuItem("Save");
         plotButton=new JMenuItem("Plot Data");
+        aboutButton=new JMenuItem("Team Information");
 
         //add listeners to menu buttons
         loadButton.addActionListener(this);
         addButton.addActionListener(this);
         saveButton.addActionListener(this);
         plotButton.addActionListener(this);
-        amenu.addMenuListener(this);
+        aboutButton.addActionListener(this);
 
         //add buttons to their respective menu
         fmenu.add(loadButton);
         fmenu.add(addButton);
         fmenu.add(saveButton);
         fmenu.add(plotButton);
+        amenu.add(aboutButton);
 
         //add menu to bar
         mb.add(fmenu);
@@ -61,7 +69,8 @@ class MenuExample implements ActionListener, MenuListener
 
         //create frame
         this.frame.setJMenuBar(mb);
-        this.frame.setSize(800,400);
+        //this.frame.setResizable(false);
+        this.frame.setSize(800,800);
         this.frame.setVisible(true);
         fileselected = 0;
     }
@@ -155,18 +164,26 @@ class MenuExample implements ActionListener, MenuListener
 
                     model.addRow(data);
                 }
+
                 table.setModel(model);
-                table.setAutoResizeMode(0);
-                table.setRowHeight(30);
-                table.setPreferredSize(new Dimension(800,600));
-                table.setMinimumSize((new Dimension(700,20)));
-                table.setMaximumSize(((new Dimension(800,20))));
-                table.getTableHeader().setMinimumSize(((new Dimension(800,20))));
-                table.setPreferredSize(new Dimension(800,600));
+                table.setRowHeight(20);
+                table.getTableHeader().setReorderingAllowed(false);
+                table.getTableHeader().setResizingAllowed(false);
+                table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                table.getTableHeader().setMinimumSize(new Dimension(30,20));
+                table.getTableHeader().setMaximumSize(new Dimension(30,20));
+                table.getColumnModel().getColumn(0).setPreferredWidth(120);
+                table.getColumnModel().getColumn(1).setPreferredWidth(120);
+                table.getColumnModel().getColumn(2).setPreferredWidth(120);
+                table.getColumnModel().getColumn(3).setPreferredWidth(120);
+                table.getColumnModel().getColumn(4).setPreferredWidth(120);
+                table.getColumnModel().getColumn(5).setPreferredWidth(120);
+
 
                 JScrollPane tablescroll = new JScrollPane(table);
+                tablescroll.setSize(2000,800);
                 frame.getContentPane().add(tablescroll, BorderLayout.CENTER);
-                this.frame.setSize(800,600);
+                this.frame.setSize(800,801);
                 this.globaltable = table;
                 this.fileselected = 1;
                 globaltablemodel = model;
@@ -225,6 +242,10 @@ class MenuExample implements ActionListener, MenuListener
                         if (s.charAt(i) == ',') {
                             commas++;
                         }
+                        if(i == s.length()-1 && s.equals(""))
+                        {
+                            commas=1;
+                        }
                     }
                     if(commas!=1)
                     {
@@ -263,7 +284,7 @@ class MenuExample implements ActionListener, MenuListener
                         String day = String.valueOf(days.getSelectedItem());
                         String newcolumn = month +" "+ day;
                         TableColumn newtc = new TableColumn();
-                        DefaultTableModel attendanceEntry = globaltablemodel;
+                        //DefaultTableModel attendanceEntry = globaltablemodel;
                         //attendanceEntry.addColumn(newcolumn);
 
                         //create new scanner to traverse file again
@@ -355,8 +376,8 @@ class MenuExample implements ActionListener, MenuListener
 
                         if(shouldreturn == 1)
                         {
-                            attendanceEntry.addColumn(newcolumn);
-                            System.out.println(shouldreturn);
+                            globaltablemodel.addColumn(newcolumn);
+                            //System.out.println(shouldreturn);
                             for(int j = 0; j< infoname.size();j++)
                             {
                                 int found =0;
@@ -385,6 +406,44 @@ class MenuExample implements ActionListener, MenuListener
                             }
                             addedcols++;
 
+                            for(int i = 0; i< globaltablemodel.getRowCount();i++)
+                            {
+                                for(int j =0; j< globaltablemodel.getColumnCount();j++)
+                                {
+                                    //System.out.println(i + " "+ j);
+                                    if(globaltablemodel.getValueAt(i,j)==null)
+                                    {
+                                        globaltablemodel.setValueAt(0,i,j);
+                                    }
+                                }
+
+                            }
+
+
+                            globaltable = new JTable();
+                            globaltable.setModel(globaltablemodel);
+                            globaltable.setRowHeight(20);
+                            globaltable.getTableHeader().setReorderingAllowed(false);
+                            //globaltable.getTableHeader().setResizingAllowed(false);
+                            globaltable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                            //table.getTableHeader().setMinimumSize(new Dimension(30,20));
+                           //table.getTableHeader().setMaximumSize(new Dimension(30,20));
+                            globaltable.getColumnModel().getColumn(0).setPreferredWidth(120);
+                            globaltable.getColumnModel().getColumn(1).setPreferredWidth(120);
+                            globaltable.getColumnModel().getColumn(2).setPreferredWidth(120);
+                            globaltable.getColumnModel().getColumn(3).setPreferredWidth(120);
+                            globaltable.getColumnModel().getColumn(4).setPreferredWidth(120);
+                            globaltable. getColumnModel().getColumn(5).setPreferredWidth(120);
+                            globaltable.setSize(800,800);
+
+                            JScrollPane tablescroll = new JScrollPane(globaltable);
+                            tablescroll.setSize(799,799);
+                            frame.getContentPane().removeAll();
+                            frame.getContentPane().add(tablescroll);
+                            //this.frame = newframe;
+                            this.frame.setSize(801,801);
+
+
                             //create dialog
                             if(missingstudents.isEmpty())
                             {
@@ -402,8 +461,7 @@ class MenuExample implements ActionListener, MenuListener
                                 }
                                 JOptionPane.showMessageDialog(frame, printdiag);
                             }
-                            this.frame.setSize(800,600);
-                            this.frame.setVisible(true);
+
                         }
 
 
@@ -479,24 +537,133 @@ class MenuExample implements ActionListener, MenuListener
                 JOptionPane.showMessageDialog(frame, "No roster selected. Load one using Load a Roster.");
                 return;
             }
-            //plot process
+
+            int extracols = addedcols-6;
+            if(extracols == 0)
+            {
+                JOptionPane.showMessageDialog(frame, "No attendance data. Add one using Add Attendance.");
+                return;
+            }
+            //System.out.println(extracols);
+            XYSeriesCollection dataset = new XYSeriesCollection();
+
+            for(int i = 0;i<extracols;i++)
+            {
+                XYSeries seriesEntry = new XYSeries(globaltablemodel.getColumnName(6+i));
+                double grade0,grade10,grade20,grade30,grade40,grade50,grade60,grade70,grade80,grade90,grade100;
+                grade0 = grade10 =grade20 =grade30 =grade40 =grade50= grade60 = grade70 = grade80 = grade90 =grade100 = 0;
+                for(int j = 0; j< globaltablemodel.getRowCount();j++)
+                {
+
+                    int entryint = (int) globaltablemodel.getValueAt(j,6+i);
+                    double entrydub = entryint;
+                    double percent = entrydub/75;
+                    if(percent >1)
+                    {
+                        percent = 1;
+                    }
+                    else
+                    {
+                        percent = Math.round(percent * 10.0)/10.0;
+                    }
+
+                    //System.out.println(percent);
+                    if(percent ==100)
+                    {
+                        grade100++;
+
+                    }
+                    else if(percent==0.9)
+                    {
+                        grade90++;
+
+                    }
+                    else if(percent==0.8)
+                    {
+                        grade80++;
+
+                    }
+                    else if(percent==0.7)
+                    {
+                        grade70++;
+
+                    }
+                    else if(percent==0.6)
+                    {
+                        grade60++;
+
+                    }
+                    else if(percent==0.5)
+                    {
+                        grade50++;
+
+                    }
+                    else if(percent==0.4)
+                    {
+                        grade40++;
+
+                    }
+                    else if(percent==0.3)
+                    {
+                        grade30++;
+
+                    }
+                    else if(percent==0.2)
+                    {
+                        grade20++;
+
+                    }
+                    else if(percent==0.1)
+                    {
+                        grade10++;
+
+                    }
+                    else if(percent==0.0)
+                    {
+                        grade0++;
+
+                    }
+
+                }
+                seriesEntry.add(0,grade0);
+                seriesEntry.add(0.1,grade10);
+                seriesEntry.add(0.2,grade20);
+                seriesEntry.add(0.3,grade30);
+                seriesEntry.add(0.4,grade40);
+                seriesEntry.add(0.5,grade50);
+                seriesEntry.add(0.6,grade60);
+                seriesEntry.add(0.7,grade70);
+                seriesEntry.add(0.8,grade80);
+                seriesEntry.add(0.9,grade90);
+                seriesEntry.add(1.0,grade100);
+                dataset.addSeries(seriesEntry);
+            }
+            JFreeChart chart = ChartFactory.createScatterPlot("Attendance vs each day", "% of Attendance", "Count", dataset);
+
+            ChartPanel chartdia = new ChartPanel(chart);
+            chartdia.setSize(1000,800);
+
+            JPanel chartpanel = new JPanel();
+            chartpanel.setSize(1100,800);
+
+            chartpanel.add(chartdia,BorderLayout.CENTER);
+            JDialog diag = new JDialog();
+            diag.setSize(1100,850);
+            diag.getContentPane().add(chartpanel);
+            diag.setVisible(true);
+        }
+
+        if(e.getSource()==aboutButton)
+        {
+            JOptionPane.showMessageDialog(frame, "Class: CSE360 Thursday\n\n" +
+                    "Team Members:\n" +
+                    "Abraham Cervantes\n" +
+                    "entername\n" +
+                    "entername\n" +
+                    "entername\n");
         }
 
     }
-
-    public void menuSelected(MenuEvent a)
-    {
-        //about process
-        JOptionPane.showMessageDialog(frame, "Hello! Welcome to our CSE360 Final Project!\n" +
-                "Our team members are:\n" +
-                "Alexander Gossett\n" +
-                "Abraham Cervantes\n" +
-                "Akshaj Kumar\n" +
-                "Brandon Vongsachang\n"
-    	);
-    }
-    public void menuDeselected(MenuEvent e) { }
-    public void menuCanceled(MenuEvent e) { }
 
     public static void main(String args[])
     {
