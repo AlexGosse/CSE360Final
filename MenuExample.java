@@ -25,7 +25,7 @@ class MenuExample implements ActionListener {
     JMenu fmenu, amenu;
     JMenuItem loadButton, addButton, saveButton, plotButton, aboutButton;
     JFrame frame;
-    Load fileLoaded;
+    //Load fileLoaded;
     JTable globaltable;
     DefaultTableModel globaltablemodel;
     JScrollPane oldscroll;
@@ -77,101 +77,22 @@ class MenuExample implements ActionListener {
 
     public void actionPerformed(ActionEvent e)
     {
+        //Load data from CSV File
         if(e.getSource()==loadButton)
         {
+            ReadFile readCSV = new ReadFile();
 
-            JFileChooser filechoose = new JFileChooser(FileSystemView.getFileSystemView());
-            FileNameExtensionFilter csvfilter = new FileNameExtensionFilter("CSV only", "CSV");
-            filechoose.setFileFilter(csvfilter);
-            filechoose.setAcceptAllFileFilterUsed(false);
-            int r = filechoose.showOpenDialog(frame);
+            DefaultTableModel model = readCSV.Read(frame, fileselected, oldscroll);
 
-            if (r == 1) {
-                JOptionPane.showMessageDialog(frame, "No file selected.");
-                return;
-            }
-            File selectedFile = filechoose.getSelectedFile();
-            //read and create table
-
-            try
-            {
-                FileInputStream fileinput = new FileInputStream(selectedFile);
-            } catch (FileNotFoundException fileNotFoundException) {
-                fileNotFoundException.printStackTrace();
-            }
-            Scanner scan1 = null;
-            try
-            {
-                scan1 = new Scanner(selectedFile);
-            } catch (FileNotFoundException fileNotFoundException) {
-                fileNotFoundException.printStackTrace();
-            }
-            String s = scan1.nextLine();
-
-            while(scan1.hasNextLine())
-            {
-                int commas = 0;
-                s =scan1.nextLine();
-                for(int i=0;i<s.length();i++) {
-                    if (s.charAt(i) == ',') {
-                        commas++;
-                    }
-                }
-                if(commas!=5)
-                {
-                    JOptionPane.showMessageDialog(frame, "CSV file has wrong format.");
-                    return;
-                }
-            }
-
-            if(fileselected==1)
-            {
-                frame.remove(oldscroll);
-                this.frame.setSize(701,400);
-            }
-
-            if (selectedFile.exists()) {
-
-
-                String[] columns = new String[]{"ID", "First Name", "Last Name", "Program", "Level", "ASURITE"};
-                //need help on Jtable
-
+            if (model != null) {
                 JTable table = new JTable();
-
-                try {
-                    FileInputStream fileinput = new FileInputStream(selectedFile);
-                } catch (FileNotFoundException fileNotFoundException) {
-                    fileNotFoundException.printStackTrace();
-                }
-                Scanner scan = null;
-                try {
-                    scan = new Scanner(selectedFile);
-                } catch (FileNotFoundException fileNotFoundException) {
-                    fileNotFoundException.printStackTrace();
-                }
-                String[] array;
-                DefaultTableModel model = new DefaultTableModel(columns, 0);
-
-                while (scan.hasNextLine()) {
-                    String line = scan.nextLine();
-                    if (line.indexOf(",") > -1)
-                        array = line.split(",");
-                    else
-                        array = line.split("\t");
-                    Object[] data = new Object[array.length];
-                    for (int i = 0; i < array.length; i++)
-                        data[i] = array[i];
-
-                    model.addRow(data);
-                }
-
                 table.setModel(model);
                 table.setRowHeight(20);
                 table.getTableHeader().setReorderingAllowed(false);
                 table.getTableHeader().setResizingAllowed(false);
                 table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-                table.getTableHeader().setMinimumSize(new Dimension(30,20));
-                table.getTableHeader().setMaximumSize(new Dimension(30,20));
+                table.getTableHeader().setMinimumSize(new Dimension(30, 20));
+                table.getTableHeader().setMaximumSize(new Dimension(30, 20));
                 table.getColumnModel().getColumn(0).setPreferredWidth(120);
                 table.getColumnModel().getColumn(1).setPreferredWidth(120);
                 table.getColumnModel().getColumn(2).setPreferredWidth(120);
@@ -181,9 +102,9 @@ class MenuExample implements ActionListener {
 
 
                 JScrollPane tablescroll = new JScrollPane(table);
-                tablescroll.setSize(2000,800);
+                tablescroll.setSize(2000, 800);
                 frame.getContentPane().add(tablescroll, BorderLayout.CENTER);
-                this.frame.setSize(800,801);
+                this.frame.setSize(800, 801);
                 this.globaltable = table;
                 this.fileselected = 1;
                 globaltablemodel = model;
@@ -191,6 +112,7 @@ class MenuExample implements ActionListener {
             }
         }
 
+        //Add attendance
         if(e.getSource()==addButton)
         {
             if(fileselected == 0)
@@ -200,7 +122,7 @@ class MenuExample implements ActionListener {
             }
             else
             {
-
+                ReadFile attendance = new ReadFile();
                 //same code as load a roster
                 JFileChooser filechoose = new JFileChooser(FileSystemView.getFileSystemView());
                 FileNameExtensionFilter csvfilter = new FileNameExtensionFilter("CSV only", "CSV");
@@ -217,7 +139,6 @@ class MenuExample implements ActionListener {
                 File selectedFile = filechoose.getSelectedFile();
 
                 //check the csv format
-
                 try
                 {
                     FileInputStream fileinput = new FileInputStream(selectedFile);
@@ -254,7 +175,6 @@ class MenuExample implements ActionListener {
                     }
                 }
 
-
                 if(selectedFile.exists())
                 {
                     //create the select a date panel
@@ -263,13 +183,15 @@ class MenuExample implements ActionListener {
                     String[] monthlist = {"January", "February", "March", "April", "May","June","July","August","September","October","November","December"};
                     JComboBox months = new JComboBox(monthlist);
 
-                    String[] daylist = {"1" , "2" , "3" , "4" , "5" , "6" , "7" , "8" , "9" , "10" , "11" , "12" , "13" , "14" , "15" , "16" , "17" , "18" , "19" , "20" , "21" , "22" , "23" , "24" , "25" , "26" , "27" , "28" , "29" , "30" , "31"};
+                    String[] daylist = new String[31];
+                    for(int i = 1; i <= 31; i++)
+                        daylist[i-1] = i + "";
+
                     JComboBox days = new JComboBox(daylist);
 
                     //add the combo boxes
                     datepane.add(months);
                     datepane.add(days);
-
 
                     int optionselected = JOptionPane.showConfirmDialog(frame,datepane, "Date", JOptionPane.OK_CANCEL_OPTION);
 
@@ -283,9 +205,6 @@ class MenuExample implements ActionListener {
                         String month = String.valueOf(months.getSelectedItem());
                         String day = String.valueOf(days.getSelectedItem());
                         String newcolumn = month +" "+ day;
-                        TableColumn newtc = new TableColumn();
-                        //DefaultTableModel attendanceEntry = globaltablemodel;
-                        //attendanceEntry.addColumn(newcolumn);
 
                         //create new scanner to traverse file again
                         try
@@ -353,8 +272,6 @@ class MenuExample implements ActionListener {
                                     infoint.add(Integer.parseInt(unsortedarray[1]));
                                 }
                             }
-
-
                         }
 
                         Vector<String> missingstudents = new Vector<String>();
@@ -393,16 +310,13 @@ class MenuExample implements ActionListener {
                                             globaltablemodel.setValueAt(infoint.get(j),i,addedcols);
                                             found = 1;
                                         }
-
                                     }
-
                                 }
                                 if(found == 0)
                                 {
                                     missingstudents.add(infoname.get(j));
                                     missingint.add(infoint.get(j));
                                 }
-
                             }
                             addedcols++;
 
@@ -416,18 +330,12 @@ class MenuExample implements ActionListener {
                                         globaltablemodel.setValueAt(0,i,j);
                                     }
                                 }
-
                             }
-
-
                             globaltable = new JTable();
                             globaltable.setModel(globaltablemodel);
                             globaltable.setRowHeight(20);
                             globaltable.getTableHeader().setReorderingAllowed(false);
-                            //globaltable.getTableHeader().setResizingAllowed(false);
                             globaltable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-                            //table.getTableHeader().setMinimumSize(new Dimension(30,20));
-                           //table.getTableHeader().setMaximumSize(new Dimension(30,20));
                             globaltable.getColumnModel().getColumn(0).setPreferredWidth(120);
                             globaltable.getColumnModel().getColumn(1).setPreferredWidth(120);
                             globaltable.getColumnModel().getColumn(2).setPreferredWidth(120);
@@ -440,9 +348,7 @@ class MenuExample implements ActionListener {
                             tablescroll.setSize(799,799);
                             frame.getContentPane().removeAll();
                             frame.getContentPane().add(tablescroll);
-                            //this.frame = newframe;
                             this.frame.setSize(801,801);
-
 
                             //create dialog
                             if(missingstudents.isEmpty())
@@ -452,25 +358,17 @@ class MenuExample implements ActionListener {
                             }
                             else
                             {
-
                                 String printdiag ="Data loaded for "+ (infoname.size() - missingstudents.size())+" users in the roster.\n\n" + missingstudents.size() +" additional students found:\n";
                                 for(int i = 0 ; i<missingstudents.size();i++)
                                 {
                                     printdiag += missingstudents.get(i)+ ", connected for " + missingint.get(i) +" minute(s).\n";
-
                                 }
                                 JOptionPane.showMessageDialog(frame, printdiag);
                             }
-
                         }
-
-
                     }
-
                 }
-
             }
-
         }
 
         if(e.getSource()==saveButton)
@@ -526,10 +424,9 @@ class MenuExample implements ActionListener {
             } catch (IOException er) {
                 er.printStackTrace();
             }
-
-
         }
 
+        //Plot data
         if(e.getSource()==plotButton)
         {
             if(fileselected == 0)
@@ -544,98 +441,36 @@ class MenuExample implements ActionListener {
                 JOptionPane.showMessageDialog(frame, "No attendance data. Add one using Add Attendance.");
                 return;
             }
-            //System.out.println(extracols);
             XYSeriesCollection dataset = new XYSeriesCollection();
 
+            //Loop through every added column for dates
             for(int i = 0;i<extracols;i++)
             {
                 XYSeries seriesEntry = new XYSeries(globaltablemodel.getColumnName(6+i));
-                double grade0,grade10,grade20,grade30,grade40,grade50,grade60,grade70,grade80,grade90,grade100;
-                grade0 = grade10 =grade20 =grade30 =grade40 =grade50= grade60 = grade70 = grade80 = grade90 =grade100 = 0;
+
+                //Number of grade entries in each range
+                double[] grade = new double[11];
+
+                //Loop through every row in the table
                 for(int j = 0; j< globaltablemodel.getRowCount();j++)
                 {
-
-                    int entryint = (int) globaltablemodel.getValueAt(j,6+i);
-                    double entrydub = entryint;
-                    double percent = entrydub/75;
+                    double percent = (double)((int)globaltablemodel.getValueAt(j,6+i))/75; //100% is 75 minutes or more
+                    //double percent = (double)((int)globaltablemodel.getValueAt(j,6+i))/100;
+                    //Percent is larger than 100%
                     if(percent >1)
-                    {
                         percent = 1;
-                    }
+                    //Round percent to have one dec
                     else
-                    {
                         percent = Math.round(percent * 10.0)/10.0;
-                    }
 
-                    //System.out.println(percent);
-                    if(percent ==100)
-                    {
-                        grade100++;
-
-                    }
-                    else if(percent==0.9)
-                    {
-                        grade90++;
-
-                    }
-                    else if(percent==0.8)
-                    {
-                        grade80++;
-
-                    }
-                    else if(percent==0.7)
-                    {
-                        grade70++;
-
-                    }
-                    else if(percent==0.6)
-                    {
-                        grade60++;
-
-                    }
-                    else if(percent==0.5)
-                    {
-                        grade50++;
-
-                    }
-                    else if(percent==0.4)
-                    {
-                        grade40++;
-
-                    }
-                    else if(percent==0.3)
-                    {
-                        grade30++;
-
-                    }
-                    else if(percent==0.2)
-                    {
-                        grade20++;
-
-                    }
-                    else if(percent==0.1)
-                    {
-                        grade10++;
-
-                    }
-                    else if(percent==0.0)
-                    {
-                        grade0++;
-
-                    }
-
+                    grade[(int)(percent * 10)]++; //Increment the number of grades at a grade range
                 }
-                seriesEntry.add(0,grade0);
-                seriesEntry.add(0.1,grade10);
-                seriesEntry.add(0.2,grade20);
-                seriesEntry.add(0.3,grade30);
-                seriesEntry.add(0.4,grade40);
-                seriesEntry.add(0.5,grade50);
-                seriesEntry.add(0.6,grade60);
-                seriesEntry.add(0.7,grade70);
-                seriesEntry.add(0.8,grade80);
-                seriesEntry.add(0.9,grade90);
-                seriesEntry.add(1.0,grade100);
+                //Add extra row entries
+                for(double gradeEntry = 0.0; gradeEntry <= 1.0; gradeEntry += 0.1) {
+                    gradeEntry = Math.round(gradeEntry * 10.0)/10.0; //Avoid floating point errors
+                    seriesEntry.add(gradeEntry, grade[(int) (gradeEntry * 10)]);
+                    System.out.println(gradeEntry * 10 + " " + grade[(int)(gradeEntry * 10)]);
+                }
                 dataset.addSeries(seriesEntry);
             }
             JFreeChart chart = ChartFactory.createScatterPlot("Attendance vs each day", "% of Attendance", "Count", dataset);
@@ -658,7 +493,7 @@ class MenuExample implements ActionListener {
             JOptionPane.showMessageDialog(frame, "Class: CSE360 Thursday\n\n" +
                     "Team Members:\n" +
                     "Abraham Cervantes\n" +
-                    "entername\n" +
+                    "Alexander Gossett\n" +
                     "entername\n" +
                     "entername\n");
         }
