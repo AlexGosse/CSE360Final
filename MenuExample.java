@@ -9,9 +9,7 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -86,6 +84,37 @@ class MenuExample implements ActionListener, MenuListener
             File selectedFile = filechoose.getSelectedFile();
             //read and create table
 
+            try
+            {
+                FileInputStream fileinput = new FileInputStream(selectedFile);
+            } catch (FileNotFoundException fileNotFoundException) {
+                fileNotFoundException.printStackTrace();
+            }
+            Scanner scan1 = null;
+            try
+            {
+                scan1 = new Scanner(selectedFile);
+            } catch (FileNotFoundException fileNotFoundException) {
+                fileNotFoundException.printStackTrace();
+            }
+            String s = scan1.nextLine();
+
+            while(scan1.hasNextLine())
+            {
+                int commas = 0;
+                s =scan1.nextLine();
+                for(int i=0;i<s.length();i++) {
+                    if (s.charAt(i) == ',') {
+                        commas++;
+                    }
+                }
+                if(commas!=5)
+                {
+                    JOptionPane.showMessageDialog(frame, "CSV file has wrong format.");
+                    return;
+                }
+            }
+
             if(fileselected==1)
             {
                 frame.remove(oldscroll);
@@ -154,6 +183,7 @@ class MenuExample implements ActionListener, MenuListener
             }
             else
             {
+
                 //same code as load a roster
                 JFileChooser filechoose = new JFileChooser(FileSystemView.getFileSystemView());
                 FileNameExtensionFilter csvfilter = new FileNameExtensionFilter("CSV only", "CSV");
@@ -161,6 +191,7 @@ class MenuExample implements ActionListener, MenuListener
                 filechoose.setAcceptAllFileFilterUsed(false);
                 int r = filechoose.showOpenDialog(frame);
 
+                //return if no roster loaded
                 if (r == 1)
                 {
                     JOptionPane.showMessageDialog(frame, "No file selected.");
@@ -168,9 +199,44 @@ class MenuExample implements ActionListener, MenuListener
                 }
                 File selectedFile = filechoose.getSelectedFile();
 
+                //check the csv format
+
+                try
+                {
+                    FileInputStream fileinput = new FileInputStream(selectedFile);
+                } catch (FileNotFoundException fileNotFoundException) {
+                    fileNotFoundException.printStackTrace();
+                }
+                Scanner scan1 = null;
+                try
+                {
+                    scan1 = new Scanner(selectedFile);
+                } catch (FileNotFoundException fileNotFoundException) {
+                    fileNotFoundException.printStackTrace();
+                }
+
+                String s;
+                //count commas in line if commas dont match close the add process
+                while(scan1.hasNextLine())
+                {
+                    int commas = 0;
+                    s =scan1.nextLine();
+                    for(int i=0;i<s.length();i++) {
+                        if (s.charAt(i) == ',') {
+                            commas++;
+                        }
+                    }
+                    if(commas!=1)
+                    {
+                        JOptionPane.showMessageDialog(frame, "CSV file has wrong format.");
+                        return;
+                    }
+                }
+
+
                 if(selectedFile.exists())
                 {
-
+                    //create the select a date panel
                     JPanel datepane = new JPanel();
 
                     String[] monthlist = {"January", "February", "March", "April", "May","June","July","August","September","October","November","December"};
@@ -179,7 +245,7 @@ class MenuExample implements ActionListener, MenuListener
                     String[] daylist = {"1" , "2" , "3" , "4" , "5" , "6" , "7" , "8" , "9" , "10" , "11" , "12" , "13" , "14" , "15" , "16" , "17" , "18" , "19" , "20" , "21" , "22" , "23" , "24" , "25" , "26" , "27" , "28" , "29" , "30" , "31"};
                     JComboBox days = new JComboBox(daylist);
 
-
+                    //add the combo boxes
                     datepane.add(months);
                     datepane.add(days);
 
@@ -192,14 +258,15 @@ class MenuExample implements ActionListener, MenuListener
                     }
                     else
                     {
+                        //get the combobox info
                         String month = String.valueOf(months.getSelectedItem());
                         String day = String.valueOf(days.getSelectedItem());
                         String newcolumn = month +" "+ day;
                         TableColumn newtc = new TableColumn();
                         DefaultTableModel attendanceEntry = globaltablemodel;
-                        attendanceEntry.addColumn(newcolumn);
+                        //attendanceEntry.addColumn(newcolumn);
 
-
+                        //create new scanner to traverse file again
                         try
                         {
                             FileInputStream fileinput = new FileInputStream(selectedFile);
@@ -243,21 +310,22 @@ class MenuExample implements ActionListener, MenuListener
                                 newinsertToggle =1;
 
                             }
-                            System.out.println(infoname.size());
+
                             if(newinsertToggle == 0)
                             {
                                 for(int i = 0; i <infoname.size();i++)
                                 {
-                                    System.out.println("comparing "+unsortedarray[0] +" and " + infoname.get(i));
+                                    //if asurite already has minutes just add to that index
                                     if(unsortedarray[0].compareTo(infoname.get(i))==0 )
                                     {
                                         int insert = Integer.parseInt(unsortedarray[1]);
-                                        System.out.println("Adding "+ insert+ " and "+ infoint.get(i));
+                                        //System.out.println("Adding "+ insert+ " and "+ infoint.get(i));
                                         insert = insert + infoint.get(i);
                                         infoint.set(i,insert);
                                         newinsertToggle =1;
                                     }
                                 }
+                                //if asurite doesnt exist already create a new entry in both vectors
                                 if(newinsertToggle==0)
                                 {
                                     infoname.add(unsortedarray[0]);
@@ -267,60 +335,76 @@ class MenuExample implements ActionListener, MenuListener
 
 
                         }
-                        System.out.println(infoname);
-                        System.out.println(infoint);
 
                         Vector<String> missingstudents = new Vector<String>();
                         Vector<Integer> missingint = new Vector<>();
 
                         //insert info into column
-                        for(int j = 0; j< infoname.size();j++)
+                        int shouldreturn = 1;
+                        if(addedcols>5)
                         {
-                            int found =0;
-                            for(int i = 0; i< globaltablemodel.getRowCount();i++)
+                            for(int i =0 ;i < addedcols;i++)
                             {
-
-                                String colString = (String) globaltablemodel.getValueAt(i,5);
-
-                                if(colString!=null)
+                                if(newcolumn.compareTo(globaltablemodel.getColumnName(i))==0)
                                 {
-                                    if(colString.compareTo(infoname.get(j))==0)
+                                    shouldreturn = 0;
+                                    JOptionPane.showMessageDialog(frame, "Column for date already exists.");
+                                }
+                            }
+                        }
+
+                        if(shouldreturn == 1)
+                        {
+                            attendanceEntry.addColumn(newcolumn);
+                            System.out.println(shouldreturn);
+                            for(int j = 0; j< infoname.size();j++)
+                            {
+                                int found =0;
+                                for(int i = 0; i< globaltablemodel.getRowCount();i++)
+                                {
+
+                                    String colString = (String) globaltablemodel.getValueAt(i,5);
+
+                                    if(colString!=null)
                                     {
-                                        globaltablemodel.setValueAt(infoint.get(j),i,addedcols);
-                                        found = 1;
+                                        if(colString.compareTo(infoname.get(j))==0)
+                                        {
+                                            globaltablemodel.setValueAt(infoint.get(j),i,addedcols);
+                                            found = 1;
+                                        }
+
                                     }
 
                                 }
+                                if(found == 0)
+                                {
+                                    missingstudents.add(infoname.get(j));
+                                    missingint.add(infoint.get(j));
+                                }
 
                             }
-                            if(found == 0)
+                            addedcols++;
+
+                            //create dialog
+                            if(missingstudents.isEmpty())
                             {
-                                missingstudents.add(infoname.get(j));
-                                missingint.add(infoint.get(j));
+                                JOptionPane.showMessageDialog(frame,
+                                        "Data loaded for "+ infoname.size()+" users in the roster.");
                             }
-
-                        }
-                        addedcols++;
-
-                        //create dialog
-                        if(missingstudents.isEmpty())
-                        {
-                            JOptionPane.showMessageDialog(frame,
-                                    "Data loaded for "+ infoname.size()+" users in the roster.");
-                        }
-                        else
-                        {
-
-                            String printdiag = missingstudents.size() +" additional students found:\n";
-                            for(int i = 0 ; i<missingstudents.size();i++)
+                            else
                             {
-                                printdiag += missingstudents.get(i)+ ", connected for " + missingint.get(i) +" minute(s).\n";
 
+                                String printdiag ="Data loaded for "+ (infoname.size() - missingstudents.size())+" users in the roster.\n\n" + missingstudents.size() +" additional students found:\n";
+                                for(int i = 0 ; i<missingstudents.size();i++)
+                                {
+                                    printdiag += missingstudents.get(i)+ ", connected for " + missingint.get(i) +" minute(s).\n";
+
+                                }
+                                JOptionPane.showMessageDialog(frame, printdiag);
                             }
-                            JOptionPane.showMessageDialog(frame, printdiag);
+                            this.frame.setSize(800,600);
+                            this.frame.setVisible(true);
                         }
-                        this.frame.setSize(800,600);
-                        this.frame.setVisible(true);
 
 
                     }
@@ -339,6 +423,53 @@ class MenuExample implements ActionListener, MenuListener
                 return;
             }
             //save process
+            JFileChooser filechoose = new JFileChooser(FileSystemView.getFileSystemView());
+            filechoose.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            FileNameExtensionFilter csvfilter = new FileNameExtensionFilter("CSV only", "CSV");
+            filechoose.setFileFilter(csvfilter);
+            int r = filechoose.showOpenDialog(frame);
+
+            if (r == 1)
+            {
+                JOptionPane.showMessageDialog(frame, "No path selected.");
+                return;
+            }
+            File fileselected = filechoose.getSelectedFile();
+            try {
+
+                String filepath = fileselected.getAbsolutePath();
+                if(!filepath.contains(".csv"))
+                {
+                    filepath += ".csv";
+                }
+                FileWriter fw = new FileWriter(filepath);
+
+                for (int i = 0; i < globaltablemodel.getColumnCount(); i++) {
+                    fw.write(globaltablemodel.getColumnName(i) + ",");
+                }
+
+                fw.write("\n");
+
+                for (int i = 0; i < globaltablemodel.getRowCount(); i++) {
+                    for (int j = 0; j < globaltablemodel.getColumnCount(); j++) {
+                        fw.write(globaltablemodel.getValueAt(i, j).toString());
+                        if(j< globaltablemodel.getColumnCount()-1)
+                        {
+                            fw.write(",");
+                        }
+                    }
+                    if(i<globaltablemodel.getRowCount()-1)
+                    {
+                        fw.write("\n");
+                    }
+                }
+
+                fw.close();
+            } catch (IOException er) {
+                er.printStackTrace();
+            }
+
+
         }
 
         if(e.getSource()==plotButton)
