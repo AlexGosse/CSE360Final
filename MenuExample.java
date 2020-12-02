@@ -487,6 +487,13 @@ class MenuExample implements ActionListener, MenuListener
     public void menuSelected(MenuEvent a)
     {
         //about process
+        JOptionPane.showMessageDialog(frame, "Hello! Welcome to our CSE360 Final Project!\n" +
+                "Our team members are:\n" +
+                "Alexander Gossett\n" +
+                "Abraham Cervantes\n" +
+                "Akshaj Kumar\n" +
+                "Brandon Vongsachang\n"
+    	);
     }
     public void menuDeselected(MenuEvent e) { }
     public void menuCanceled(MenuEvent e) { }
