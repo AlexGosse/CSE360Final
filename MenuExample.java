@@ -371,7 +371,6 @@ class MenuExample implements ActionListener {
             }
         }
 
-        //Save data to csv
         if(e.getSource()==saveButton)
         {
             if(fileselected == 0)
@@ -393,6 +392,7 @@ class MenuExample implements ActionListener {
             }
             File fileselected = filechoose.getSelectedFile();
             try {
+
                 String filepath = fileselected.getAbsolutePath();
                 if(!filepath.contains(".csv"))
                 {
@@ -459,7 +459,7 @@ class MenuExample implements ActionListener {
                     //Percent is larger than 100%
                     if(percent >1)
                         percent = 1;
-                    //Round percent to have one dec
+                        //Round percent to have one dec
                     else
                         percent = Math.round(percent * 10.0)/10.0;
 
@@ -494,15 +494,10 @@ class MenuExample implements ActionListener {
                     "Team Members:\n" +
                     "Abraham Cervantes\n" +
                     "Alexander Gossett\n" +
-                    "Akshaj Kumar\n\n" +
-                    "Brandon Vongsachang\n\n");
+                    "Akshaj Kumar\n" +
+                    "Brandon Vongsachang\n");
         }
 
     }
 
-    public static void main(String args[])
-    {
-        JFrame frame1 = new JFrame("CSE360 Final Project");
-        new MenuExample(frame1);
-    }
 }
