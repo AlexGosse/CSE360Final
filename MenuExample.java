@@ -371,6 +371,7 @@ class MenuExample implements ActionListener {
             }
         }
 
+        //Save data to csv
         if(e.getSource()==saveButton)
         {
             if(fileselected == 0)
@@ -392,7 +393,6 @@ class MenuExample implements ActionListener {
             }
             File fileselected = filechoose.getSelectedFile();
             try {
-
                 String filepath = fileselected.getAbsolutePath();
                 if(!filepath.contains(".csv"))
                 {
@@ -494,8 +494,8 @@ class MenuExample implements ActionListener {
                     "Team Members:\n" +
                     "Abraham Cervantes\n" +
                     "Alexander Gossett\n" +
-                    "entername\n" +
-                    "entername\n");
+                    "Akshaj Kumar\n\n" +
+                    "Brandon Vongsachang\n\n");
         }
 
     }

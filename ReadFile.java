@@ -9,6 +9,7 @@ import java.util.Scanner;
 import java.util.Vector;
 
 public class ReadFile {
+    //Produces a table model
     public DefaultTableModel Read(JFrame frame, int fileselected, JScrollPane oldscroll) {
         JFileChooser filechoose = new JFileChooser(FileSystemView.getFileSystemView());
         FileNameExtensionFilter csvfilter = new FileNameExtensionFilter("CSV only", "CSV");
@@ -47,6 +48,7 @@ public class ReadFile {
                     commas++;
                 }
             }
+            //
             if (commas != 5) {
                 JOptionPane.showMessageDialog(frame, "CSV file has wrong format.");
                 return null;
